@@ -3,6 +3,7 @@ const router = express.Router();
 const Attendance = require('../models/attendance'); // Ensure this path is correct
 const Student = require('../models/student'); // Ensure this path is correct
 
+// Retrieve attendance records for a specific course and include student details
 router.get('/:course_id', async (req, res) => {
   const { course_id } = req.params;
 
