@@ -1,34 +1,34 @@
 What each route does in the routes folder:
 ---
-Route: `attendanceRoutes.js`
-// Retrieve all attendance records
-// Add a new attendance record
-// Update an existing attendance record
+Route: `attendanceRoutes.js` <br>
+// Retrieve all attendance records <br>
+// Add a new attendance record <br>
+// Update an existing attendance record <br>
 ---
-Route: `lecturerCourseAttendance.js`
-// Retrieve attendance records for a specific course taught by a lecturer
+Route: `lecturerCourseAttendance.js` <br>
+// Retrieve attendance records for a specific course taught by a lecturer <br>
 ---
-Route: `courseAttendance.js`
-// Retrieve attendance records for a specific course and include student details
+Route: `courseAttendance.js`<br>
+// Retrieve attendance records for a specific course and include student details<br>
 ---
-Route: `fileUpload.js`
-// Set up multer for file storage
-// Endpoint to handle file uploads
+Route: `fileUpload.js`<br>
+// Set up multer for file storage<br>
+// Endpoint to handle file uploads<br>
 ---
-Route: `login.js`
-// Endpoint to handle user login
+Route: `login.js`<br>
+// Endpoint to handle user login<br>
 ---
-Route: `notifications.js`
-// Set up multer for file storage
-// Helper function to format date as YYYY-MM-DD
-// Create a notification
-// Retrieve notifications by recipient_id
-// Serve uploaded files
+Route: `notifications.js`<br>
+// Set up multer for file storage<br>
+// Helper function to format date as YYYY-MM-DD<br>
+// Create a notification<br>
+// Retrieve notifications by recipient_id<br>
+// Serve uploaded files<br>
 ---
-Route: `studentCourses.js`
-// Retrieve courses for a specific student
+Route: `studentCourses.js`<br>
+// Retrieve courses for a specific student <br>
 ---
-Route: `lecturerCourses.js`
-// Retrieve courses for a specific lecturer
+Route: `lecturerCourses.js`<br>
+// Retrieve courses for a specific lecturer<br>
 ---
 
