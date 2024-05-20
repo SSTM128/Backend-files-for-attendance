@@ -29,4 +29,5 @@ Route: `studentCourses.js`
 ---
 Route: `lecturerCourses.js`
 // Retrieve courses for a specific lecturer
+---
 
