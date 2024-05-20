@@ -15,6 +15,9 @@ Route: `fileUpload.js`<br>
 // Set up multer for file storage<br>
 // Endpoint to handle file uploads<br>
 ---
+Route: `fileDownload.js`<br>
+// Serve file based on the file path in the database using notification_id<br>
+---
 Route: `login.js`<br>
 // Endpoint to handle user login<br>
 ---
