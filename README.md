@@ -1,3 +1,4 @@
+What each route does in the routes folder:
 ---
 Route: `attendanceRoutes.js`
 // Retrieve all attendance records
