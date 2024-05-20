@@ -1,6 +1,23 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const Notification = require('../models/notification'); // Ensure this path is correct
+
+// Set up multer for file storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Directory to store files
+  },
+  filename: (req, file, cb) => {
+    const timestamp = Date.now();
+    const originalName = file.originalname;
+    const extension = path.extname(originalName);
+    cb(null, `${timestamp}${extension}`); // Filename: timestamp + original extension
+  }
+});
+
+const upload = multer({ storage: storage });
 
 // Helper function to format date as YYYY-MM-DD
 const formatDateAsString = (date) => {
@@ -12,19 +29,26 @@ const formatDateAsString = (date) => {
 };
 
 // Create a notification
-router.post('/', async (req, res) => {
+router.post('/', upload.single('file'), async (req, res) => {
   const { recipient_id, sender_id, message, date_sent, course_id } = req.body;
+  let file_path = null;
 
   try {
     // Use the helper function to format the date as a string
     const notificationDate = date_sent ? formatDateAsString(date_sent) : formatDateAsString(new Date());
+
+    // Check if a file is uploaded
+    if (req.file) {
+      file_path = path.join('uploads', req.file.filename);
+    }
 
     const newNotification = new Notification({
       recipient_id,
       sender_id,
       message,
       date_sent: notificationDate,
-      course_id
+      course_id,
+      file_path // Add file path to the notification document if a file was uploaded
     });
 
     const savedNotification = await newNotification.save();
@@ -44,6 +68,13 @@ router.get('/:recipient_id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
+});
+
+// Serve uploaded files
+router.get('/file/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filePath = path.join(__dirname, '../uploads', filename);
+  res.sendFile(filePath);
 });
 
 module.exports = router;

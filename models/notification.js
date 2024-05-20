@@ -6,8 +6,9 @@ const NotificationSchema = new Schema({
   recipient_id: { type: String, required: true },
   sender_id: { type: String, required: true },
   message: { type: String, required: true },
-  date_sent: { type: String, required: true }, // Change date_sent to String
-  course_id: { type: String, required: true }
+  date_sent: { type: String, required: true }, // Ensure date is stored as string
+  course_id: { type: String, required: true },
+  file_path: { type: String } // Add file_path field
 }, { collection: 'NOTIFICATION' });
 
 module.exports = mongoose.model('Notification', NotificationSchema);
