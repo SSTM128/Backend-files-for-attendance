@@ -108,4 +108,20 @@
             "validity_period": "number"
           }
           ```
+
+11. **qrUpdate.js**
+   - **API Call:** `/api/qr`
+   - **Functionalities:**
+     - **Update attendance based on scanned QR code:** `POST /api/qr/scan`
+       - **Request Body:**
+         ```json
+         {
+           "student_id": "string",
+           "course_id": "string",
+           "date": "string",
+           "passcode": "string"
+         }
+         ```
+
+       
 --------------------------------
