@@ -51,5 +51,11 @@ This summary includes all the routes, their API calls, and their functionalities
    - **Functionalities:**
      - **Serve file based on the file path in the database:** `GET /api/files/:id`
 
+
+10. **qrRoutes.js**
+   - **API Call:** `/api/qr`
+   - **Functionalities:**
+     - **Generate a passcode and update it in the database for a specific course:** `POST /api/qr/generate/:course_id` (with `validity_period` in the request body)
+
 ---
 
