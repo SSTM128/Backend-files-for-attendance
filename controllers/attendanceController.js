@@ -58,10 +58,6 @@ exports.getAttendances = async (req, res) => {
   }
 };
 
-// Other controller methods...
-
-
-
 exports.addAttendance = async (req, res) => {
   try {
     const newRecord = new Attendance(req.body);
@@ -73,20 +69,19 @@ exports.addAttendance = async (req, res) => {
 };
 
 exports.updateAttendance = async (req, res) => {
-  const { inClassNo, date, status } = req.body;
+  const { student_id, course_id, date, status } = req.body;
 
   try {
-    const record = await Attendance.findOne({ inClassNumber: inClassNo });
+    const record = await Attendance.findOne({ student_id: student_id, course_id: course_id });
     if (record) {
       const attendance = record.attendances.find(a => a.date === date);
       if (attendance) {
         attendance.status = status; // Update the status
+        await record.save(); // Save the updated record
+        res.json({ success: true, message: 'Attendance updated successfully', data: record });
       } else {
-        // If no attendance for that date exists, add it
-        record.attendances.push({ date, status });
+        res.status(404).json({ success: false, message: 'Attendance record for the specified date not found' });
       }
-      await record.save(); // Save the updated record
-      res.json({ success: true, message: 'Attendance updated successfully', data: record });
     } else {
       res.status(404).json({ success: false, message: 'Record not found' });
     }

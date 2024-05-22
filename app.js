@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const attendanceRoutes = require('./routes/attendanceRoutes');
+const attendanceRoutes = require('./routes/attendanceRoutes'); // Ensure this path is correct
 const loginRoute = require('./routes/login'); // Import login route
 const lecturerCoursesRoute = require('./routes/lecturerCourses'); // Import lecturer courses route
 const courseAttendanceRoute = require('./routes/courseAttendance'); // Import course attendance route
@@ -33,7 +33,7 @@ mongoose.connect(dbURI, {
 
 
 // Routes to be used and their api line
-app.use('/attendances', attendanceRoutes);
+app.use('/api/attendances', attendanceRoutes); // Ensure the base route is correct
 app.use('/api', loginRoute); // Add login route
 app.use('/api/lecturer-courses', lecturerCoursesRoute); // Add lecturer courses route
 app.use('/api/course-attendance', courseAttendanceRoute); // Add course attendance route
