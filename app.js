@@ -12,6 +12,7 @@ const notificationsRoute = require('./routes/notifications'); // Import notifica
 const fileUploadRoute = require('./routes/fileUpload'); // Import file upload route
 const fileDownloadRoute = require('./routes/fileDownload'); // Import file download route
 const qrRoutes = require('./routes/qrRoutes'); // Import QR routes
+const qrUpdateRoute = require('./routes/qrUpdate'); // Import QR update route
 
 
 
@@ -43,8 +44,8 @@ app.use('/api/lecturer-course-attendance', lecturerCourseAttendanceRoute); // Ad
 app.use('/api/notifications', notificationsRoute); // Add notifications route
 app.use('/api/files', fileUploadRoute); // Add file upload route
 app.use('/api/files', fileDownloadRoute); // Add file download route
-app.use('/api/qr', qrRoutes); // Add QR routes
-
+app.use('/api/qr', qrRoutes); // Add QR route to generate new pass and time
+app.use('/api/qr', qrUpdateRoute); // Add QR update route
 
 
 
