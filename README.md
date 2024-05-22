@@ -106,6 +106,7 @@
           ```json
           {
             "validity_period": "number"
+            "date": "string"
           }
           ```
 
