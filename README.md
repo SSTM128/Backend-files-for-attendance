@@ -9,9 +9,9 @@ This summary includes all the routes, their API calls, and their functionalities
      - **Update an existing attendance record:** `PUT /api/attendances`
 
 2. **login.js**
-   - **API Call:** `/api/login`
+   - **API Call:** `/api/`
    - **Functionalities:**
-     - **User login:** `POST /api/login`
+     - **User login:** `POST /api/`
 
 3. **lecturerCourses.js**
    - **API Call:** `/api/lecturer-courses`
