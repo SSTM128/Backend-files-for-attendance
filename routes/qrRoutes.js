@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const QRCode = require('../models/qrCode'); // Ensure this path is correct
+const Attendance = require('../models/attendance'); // Ensure this path is correct
 
 // Generate a passcode and update it in the database
 router.post('/generate/:course_id', async (req, res) => {
   const { course_id } = req.params;
-  const { validity_period } = req.body; // Get the validity period from the request body
+  const { validity_period, date } = req.body; // Get the validity period and date from the request body
 
   // Generate a random passcode (e.g., 6 characters long)
   const generatePasscode = () => {
@@ -31,12 +32,36 @@ router.post('/generate/:course_id', async (req, res) => {
       existingQRCode.validity_start_time = validityStartTime.toISOString();
       existingQRCode.validity_end_time = validityEndTime.toISOString();
 
-      const updatedQRCode = await existingQRCode.save();
-
-      res.json({ passcode: passcode });
+      await existingQRCode.save();
     } else {
-      res.status(404).json({ message: 'QR code record for the specified course_id not found' });
+      return res.status(404).json({ message: 'QR code record for the specified course_id not found' });
     }
+
+    // Set all students who haven't scanned to 'absent' if their status is not 'attended'
+    const attendanceRecords = await Attendance.find({ course_id: course_id });
+
+    for (const record of attendanceRecords) {
+      const attendanceEntry = record.attendances.find(a => a.date === date);
+
+      if (attendanceEntry && attendanceEntry.status !== 'attended') {
+        attendanceEntry.status = 'absent';
+      } else if (!attendanceEntry) {
+        // If no attendance entry for that date, add it as 'absent' without _id
+        record.attendances.push({ date: date, status: 'absent' });
+      }
+
+      // Remove _id field from all attendances that do not already have an _id
+      record.attendances = record.attendances.map(att => {
+        if (!att._id) {
+          return { date: att.date, status: att.status };
+        }
+        return att;
+      });
+
+      await record.save();
+    }
+
+    res.json({ passcode: passcode });
   } catch (error) {
     res.status(500).json({ message: 'Internal server error', error: error.message });
   }
