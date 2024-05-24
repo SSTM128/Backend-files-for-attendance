@@ -22,6 +22,17 @@ router.post('/generate/:course_id', async (req, res) => {
   const validityStartTime = new Date(); // Set the start time to now
   const validityEndTime = new Date(validityStartTime.getTime() + validity_period * 60 * 1000); // Add validity period in minutes
 
+  // Format the date to YYYY/MM/DD
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}/${month}/${day}`;
+  };
+
+  const formattedDate = formatDate(date);
+
   try {
     // Check if a QR code record exists for the given course_id
     const existingQRCode = await QRCode.findOne({ course_id: course_id });
@@ -41,13 +52,13 @@ router.post('/generate/:course_id', async (req, res) => {
     const attendanceRecords = await Attendance.find({ course_id: course_id });
 
     for (const record of attendanceRecords) {
-      const attendanceEntry = record.attendances.find(a => a.date === date);
+      const attendanceEntry = record.attendances.find(a => a.date === formattedDate);
 
       if (attendanceEntry && attendanceEntry.status !== 'attended') {
         attendanceEntry.status = 'absent';
       } else if (!attendanceEntry) {
         // If no attendance entry for that date, add it as 'absent' without _id
-        record.attendances.push({ date: date, status: 'absent' });
+        record.attendances.push({ date: formattedDate, status: 'absent' });
       }
 
       // Remove _id field from all attendances that do not already have an _id
