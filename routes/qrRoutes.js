@@ -64,7 +64,7 @@ router.post('/generate/:course_id', async (req, res) => {
       // Remove _id field from all attendances that do not already have an _id
       record.attendances = record.attendances.map(att => {
         if (!att._id) {
-          return { date: att.date, status: att.status };
+          delete att._id;
         }
         return att;
       });
