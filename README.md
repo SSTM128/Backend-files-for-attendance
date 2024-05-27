@@ -32,7 +32,7 @@
          ```
 
 2. **login.js**
-   - **API Call:** `/api/`
+   - **API Call:** `/api/login`
    - **Functionalities:**
      - **User login:** `POST /api/`
        - **Request Body:**
