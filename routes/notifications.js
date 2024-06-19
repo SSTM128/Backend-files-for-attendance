@@ -1,14 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
 const Notification = require('../models/notification'); // Ensure this path is correct
 const bucket = require('../firebase'); // Ensure this path is correct
 
-// Set up multer for file storage in memory
 const upload = multer({
   storage: multer.memoryStorage(), // Store file in memory temporarily
 });
+
+// Helper function to generate a unique file name
+const generateFileName = (originalName) => {
+  const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
+  const extension = originalName.split('.').pop();
+  return `${timestamp}.${extension}`;
+};
 
 // Helper function to format date as YYYY/MM/DD
 const formatDateAsString = (date) => {
@@ -30,7 +35,8 @@ router.post('/', upload.single('file'), async (req, res) => {
 
     // Check if a file is uploaded
     if (req.file) {
-      const blob = bucket.file(req.file.originalname);
+      const newFileName = generateFileName(req.file.originalname);
+      const blob = bucket.file(newFileName);
       const blobStream = blob.createWriteStream({
         metadata: {
           contentType: req.file.mimetype,
