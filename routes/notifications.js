@@ -3,23 +3,14 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const Notification = require('../models/notification'); // Ensure this path is correct
+const bucket = require('../firebase'); // Ensure this path is correct
 
-// Set up multer for file storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Directory to store files
-  },
-  filename: (req, file, cb) => {
-    const timestamp = Date.now();
-    const originalName = file.originalname;
-    const extension = path.extname(originalName);
-    cb(null, `${timestamp}${extension}`); // Filename: timestamp + original extension
-  }
+// Set up multer for file storage in memory
+const upload = multer({
+  storage: multer.memoryStorage(), // Store file in memory temporarily
 });
 
-const upload = multer({ storage: storage });
-
-// Helper function to format date as YYYY-MM-DD
+// Helper function to format date as YYYY/MM/DD
 const formatDateAsString = (date) => {
   const dateObj = new Date(date);
   const year = dateObj.getFullYear();
@@ -39,20 +30,47 @@ router.post('/', upload.single('file'), async (req, res) => {
 
     // Check if a file is uploaded
     if (req.file) {
-      file_path = path.join('uploads', req.file.filename);
+      const blob = bucket.file(req.file.originalname);
+      const blobStream = blob.createWriteStream({
+        metadata: {
+          contentType: req.file.mimetype,
+        },
+      });
+
+      blobStream.on('error', (err) => {
+        res.status(500).send({ message: 'Something went wrong', error: err.message });
+      });
+
+      blobStream.on('finish', async () => {
+        // The public URL can be used to directly access the file via HTTP
+        const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+
+        const newNotification = new Notification({
+          recipient_id,
+          sender_id,
+          message,
+          date_sent: notificationDate,
+          course_id,
+          file_path: publicUrl // Add file path to the notification document
+        });
+
+        const savedNotification = await newNotification.save();
+        res.json(savedNotification);
+      });
+
+      blobStream.end(req.file.buffer);
+    } else {
+      const newNotification = new Notification({
+        recipient_id,
+        sender_id,
+        message,
+        date_sent: notificationDate,
+        course_id
+      });
+
+      const savedNotification = await newNotification.save();
+      res.json(savedNotification);
     }
-
-    const newNotification = new Notification({
-      recipient_id,
-      sender_id,
-      message,
-      date_sent: notificationDate,
-      course_id,
-      file_path // Add file path to the notification document if a file was uploaded
-    });
-
-    const savedNotification = await newNotification.save();
-    res.json(savedNotification);
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -69,14 +87,6 @@ router.get('/:recipient_id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-
-// Serve uploaded files
-router.get('/file/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const filePath = path.join(__dirname, '../uploads', filename);
-  res.sendFile(filePath);
-});
-
 
 // Delete a notification by notification_id
 router.delete('/delete/:id', async (req, res) => {

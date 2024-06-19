@@ -14,10 +14,10 @@ const fileDownloadRoute = require('./routes/fileDownload'); // Import file downl
 const qrRoutes = require('./routes/qrRoutes'); // Import QR routes
 const qrUpdateRoute = require('./routes/qrUpdate'); // Import QR update route
 
+// Initialize Firebase
+require('./firebase'); // Ensure this path is correct
 
-
-//end of route declaration
-
+// End of route declaration
 const app = express();
 
 // Middleware
@@ -27,14 +27,12 @@ app.use(bodyParser.json());
 // MongoDB Atlas Connection
 const dbURI = 'mongodb+srv://PC:1EVwjeQt8CFDuvsh@attendance.aotlhct.mongodb.net/?retryWrites=true&w=majority&appName=Attendance';
 mongoose.connect(dbURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 }).then(() => console.log('MongoDB connected via Atlas'))
   .catch(err => console.log(err));
 
-
-
-// Routes to be used and their api line
+// Routes to be used and their API line
 app.use('/api/attendances', attendanceRoutes); // Ensure the base route is correct
 app.use('/api', loginRoute); // Add login route
 app.use('/api/lecturer-courses', lecturerCoursesRoute); // Add lecturer courses route
@@ -47,13 +45,9 @@ app.use('/api/files', fileDownloadRoute); // Add file download route
 app.use('/api/qr', qrRoutes); // Add QR route to generate new pass and time
 app.use('/api/qr', qrUpdateRoute); // Add QR update route
 
-
-
-
-
-//check app is working when running server.js
+// Check app is working when running server.js
 app.get('/', (req, res) => {
-    res.send('Welcome to the Attendance System');
+  res.send('Welcome to the Attendance System');
 });
 
 module.exports = app;

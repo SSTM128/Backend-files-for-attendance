@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
 const Notification = require('../models/notification'); // Ensure this path is correct
 
 // Serve file based on the file path in the database
@@ -13,11 +12,10 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ message: 'File not found' });
     }
 
-    const filePath = path.join(__dirname, '../', notification.file_path);
-    const fileName = path.basename(filePath); // Extract the file name from the path
+    const fileUrl = notification.file_path;
 
-    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
-    res.sendFile(filePath);
+    // Redirect the client to the public URL of the file in Firebase Storage
+    res.redirect(fileUrl);
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
   }

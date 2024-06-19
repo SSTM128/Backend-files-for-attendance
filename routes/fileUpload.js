@@ -1,30 +1,35 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
+const bucket = require('../firebase'); // Ensure this path is correct
 
-// Set up multer for file storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Directory to store files
-  },
-  filename: (req, file, cb) => {
-    const timestamp = Date.now();
-    const originalName = file.originalname;
-    const extension = path.extname(originalName);
-    cb(null, `${timestamp}${extension}`); // Filename: timestamp + original extension
-  }
+const upload = multer({
+  storage: multer.memoryStorage(), // Store file in memory temporarily
 });
 
-const upload = multer({ storage: storage });
-
-// Endpoint to handle file uploads
-router.post('/upload', upload.single('file'), (req, res) => {
+router.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
   }
-  const filePath = path.join('uploads', req.file.filename);
-  res.json({ filePath: filePath });
+
+  const blob = bucket.file(req.file.originalname);
+  const blobStream = blob.createWriteStream({
+    metadata: {
+      contentType: req.file.mimetype,
+    },
+  });
+
+  blobStream.on('error', (err) => {
+    res.status(500).send({ message: 'Something went wrong', error: err.message });
+  });
+
+  blobStream.on('finish', () => {
+    // The public URL can be used to directly access the file via HTTP
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
+    res.status(200).send({ fileName: req.file.originalname, fileLocation: publicUrl });
+  });
+
+  blobStream.end(req.file.buffer);
 });
 
 module.exports = router;
