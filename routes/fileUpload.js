@@ -7,12 +7,20 @@ const upload = multer({
   storage: multer.memoryStorage(), // Store file in memory temporarily
 });
 
+// Helper function to generate a unique file name
+const generateFileName = (originalName) => {
+  const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
+  const extension = originalName.split('.').pop();
+  return `${timestamp}.${extension}`;
+};
+
 router.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: 'No file uploaded' });
   }
 
-  const blob = bucket.file(req.file.originalname);
+  const newFileName = generateFileName(req.file.originalname);
+  const blob = bucket.file(newFileName);
   const blobStream = blob.createWriteStream({
     metadata: {
       contentType: req.file.mimetype,
@@ -26,7 +34,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   blobStream.on('finish', () => {
     // The public URL can be used to directly access the file via HTTP
     const publicUrl = `https://storage.googleapis.com/${bucket.name}/${blob.name}`;
-    res.status(200).send({ fileName: req.file.originalname, fileLocation: publicUrl });
+    res.status(200).send({ fileName: newFileName, fileLocation: publicUrl });
   });
 
   blobStream.end(req.file.buffer);
