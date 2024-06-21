@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('../models/notification'); // Ensure this path is correct
+const axios = require('axios'); // We'll use axios to fetch the file
 
 // Serve file based on the file path in the database
 router.get('/:id', async (req, res) => {
@@ -14,10 +15,19 @@ router.get('/:id', async (req, res) => {
 
     const fileUrl = notification.file_path;
 
-    // Redirect the client to the public URL of the file in Firebase Storage
-    res.redirect(fileUrl);
+    // Fetch the file from Firebase Storage
+    const response = await axios.get(fileUrl, {
+      responseType: 'stream',
+    });
+
+    // Set the headers to force download
+    res.setHeader('Content-Disposition', `attachment; filename=${notification.file_path.split('/').pop()}`);
+    res.setHeader('Content-Type', response.headers['content-type']);
+
+    // Pipe the file stream to the response
+    response.data.pipe(res);
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error', error: error.message });
   }
 });
 
